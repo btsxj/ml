@@ -1,0 +1,104 @@
+One question about RDD.zip function when trying Naive Bayes.
+
+I a newbie to Spark MLlib and ran into a curious case when following the instruction at the page below.
+
+http://spark.apache.org/docs/latest/mllib-naive-bayes.html
+
+I ran a test program on my local machine using some data.
+
+val spConfig = (new SparkConf).setMaster("local").setAppName("SparkNaiveBayes")
+val sc = new SparkContext(spConfig)
+
+The test data was as follows and there were three lableled categories I wanted to predict.
+
+ 1  LabeledPoint(0.0, [4.9,3.0,1.4,0.2])
+ 2  LabeledPoint(0.0, [4.6,3.4,1.4,0.3])
+ 3  LabeledPoint(0.0, [5.7,4.4,1.5,0.4])
+ 4  LabeledPoint(0.0, [5.2,3.4,1.4,0.2])
+ 5  LabeledPoint(0.0, [4.7,3.2,1.6,0.2])
+ 6  LabeledPoint(0.0, [4.8,3.1,1.6,0.2])
+ 7  LabeledPoint(0.0, [5.1,3.8,1.9,0.4])
+ 8  LabeledPoint(0.0, [4.8,3.0,1.4,0.3])
+ 9  LabeledPoint(0.0, [5.0,3.3,1.4,0.2])
+10  LabeledPoint(1.0, [6.6,2.9,4.6,1.3])
+11  LabeledPoint(1.0, [5.2,2.7,3.9,1.4])
+12  LabeledPoint(1.0, [5.6,2.5,3.9,1.1])
+13  LabeledPoint(1.0, [6.4,2.9,4.3,1.3])
+14  LabeledPoint(1.0, [6.6,3.0,4.4,1.4])
+15  LabeledPoint(1.0, [6.0,2.7,5.1,1.6])
+16  LabeledPoint(1.0, [5.5,2.6,4.4,1.2])
+17  LabeledPoint(1.0, [5.8,2.6,4.0,1.2])
+18  LabeledPoint(1.0, [5.7,2.9,4.2,1.3])
+19  LabeledPoint(1.0, [5.7,2.8,4.1,1.3])
+20  LabeledPoint(2.0, [6.3,2.9,5.6,1.8])
+21  LabeledPoint(2.0, [6.5,3.0,5.8,2.2])
+22  LabeledPoint(2.0, [6.5,3.0,5.5,1.8])
+23  LabeledPoint(2.0, [6.7,3.3,5.7,2.1])
+24  LabeledPoint(2.0, [7.4,2.8,6.1,1.9])
+25  LabeledPoint(2.0, [6.3,3.4,5.6,2.4])
+26  LabeledPoint(2.0, [6.0,3.0,4.8,1.8])
+27  LabeledPoint(2.0, [6.8,3.2,5.9,2.3])
+
+The predicted result via NaiveBayes is below. Comparing to test data, only two predicted results(#11 and #15) were different.
+
+ 1  0.0
+ 2  0.0
+ 3  0.0
+ 4  0.0
+ 5  0.0
+ 6  0.0
+ 7  0.0
+ 8  0.0
+ 9  0.0
+10  1.0
+11  2.0
+12  1.0
+13  1.0
+14  1.0
+15  2.0
+16  1.0
+17  1.0
+18  1.0
+19  1.0
+20  2.0
+21  2.0
+22  2.0
+23  2.0
+24  2.0
+25  2.0
+26  2.0
+27  2.0
+
+After grouping test RDD and predicted RDD via zip I got this.
+
+ 1  (0.0,0.0)
+ 2  (0.0,0.0)
+ 3  (0.0,0.0)
+ 4  (0.0,0.0)
+ 5  (0.0,0.0)
+ 6  (0.0,0.0)
+ 7  (0.0,0.0)
+ 8  (0.0,0.0)
+ 9  (0.0,1.0)
+10  (0.0,1.0)
+11  (0.0,1.0)
+12  (1.0,1.0)
+13  (1.0,1.0)
+14  (2.0,1.0)
+15  (1.0,1.0)
+16  (1.0,2.0)
+17  (1.0,2.0)
+18  (1.0,2.0)
+19  (1.0,2.0)
+20  (2.0,2.0)
+21  (2.0,2.0)
+22  (2.0,2.0)
+23  (2.0,2.0)
+24  (2.0,2.0)
+25  (2.0,2.0)
+
+I expected there were 27 pairs but I saw two results were lost.
+Could someone please point out what I missed something here?
+
+Regards,
+xj
