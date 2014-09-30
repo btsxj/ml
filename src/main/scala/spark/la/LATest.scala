@@ -57,11 +57,28 @@ object LATest extends App {
   val spConfig = (new SparkConf).setMaster("local").setAppName("SparkLA")
   val sc = new SparkContext(spConfig)
  
+  // Load and parse Coordinate(COO) Sparse Matrix
+  val coo_matrix_input = sc.textFile("D:/xiaojun/lesson/worksp/scala/ml/src/main/resources/latest3_coo.txt").map( line =>
+    line.split(' ')
+  )
+  println(coo_matrix_input.partitions.size)
+  val cols_num = coo_matrix_input.collect.apply(1).map(_.toInt).reduceLeft(_ max _) + 1
+  val coo_matrix_tuple = coo_matrix_input.flatMap(_.zipWithIndex).groupBy(_._2).values.map(e => e.map(d => d._1)).map{ e =>
+    val a = e.toArray
+    (a(0).toInt, (a(1).toInt, a(2).toDouble))
+  }
+  val coo_matrix = coo_matrix_tuple.groupByKey.sortByKey(true)
+  val rows = coo_matrix.map{ e =>
+    Vectors.sparse(cols_num, e._2.toSeq)
+  }
+  coo_matrix.foreach{e => print(e._1 + " "); e._2.foreach( e => print("("+e._1 + " " + e._2 + ") ")); println}
+
+
   // Load and parse the data file.
-  val rows = sc.textFile("D:/xiaojun/lesson/worksp/scala/ml/src/main/resources/latest3.txt").map { line =>
+  /*val rows = sc.textFile("D:/xiaojun/lesson/worksp/scala/ml/src/main/resources/latest3.txt").map { line =>
     val values = line.split(' ').map(_.toDouble)
     Vectors.sparse(values.length, values.zipWithIndex.map(e => (e._2, e._1)).filter(_._2 != 0.0) )
-  }
+  } */
   // Build a distributed RowMatrix
   val rmat = new RowMatrix(rows)
   
