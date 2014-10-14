@@ -58,7 +58,8 @@ object LATest extends App {
   val sc = new SparkContext(spConfig)
  
   // Load and parse Coordinate(COO) Sparse Matrix
-  val coo_matrix_input = sc.textFile("D:/xiaojun/lesson/worksp/scala/ml/src/main/resources/latest3_coo.txt").map( line =>
+  //val coo_matrix_input = sc.textFile("D:/xiaojun/lesson/worksp/scala/ml/src/main/resources/latest3_coo.txt").map( line =>
+  val coo_matrix_input = sc.textFile("D:/xiaojun/lesson/worksp/scala/ml/src/main/resources/latest5_coo.txt", 3).map( line =>  
     line.split(' ')
   )
   println(coo_matrix_input.partitions.size)
@@ -72,10 +73,12 @@ object LATest extends App {
     Vectors.sparse(cols_num, e._2.toSeq)
   }
   coo_matrix.foreach{e => print(e._1 + " "); e._2.foreach( e => print("("+e._1 + " " + e._2 + ") ")); println}
-
+  
 
   // Load and parse the data file.
-  /*val rows = sc.textFile("D:/xiaojun/lesson/worksp/scala/ml/src/main/resources/latest3.txt").map { line =>
+  /*
+  //val rows = sc.textFile("D:/xiaojun/lesson/worksp/scala/ml/src/main/resources/latest3.txt").map { line =>
+  val rows = sc.textFile("D:/xiaojun/lesson/worksp/scala/ml/src/main/resources/latest5.txt").map { line =>
     val values = line.split(' ').map(_.toDouble)
     Vectors.sparse(values.length, values.zipWithIndex.map(e => (e._2, e._1)).filter(_._2 != 0.0) )
   } */
@@ -83,18 +86,19 @@ object LATest extends App {
   val rmat = new RowMatrix(rows)
   
   // Build a local DenseMatrix
-  val dm = sc.textFile("D:/xiaojun/lesson/worksp/scala/ml/src/main/resources/latest4.txt").map { line =>
+  //val dm = sc.textFile("D:/xiaojun/lesson/worksp/scala/ml/src/main/resources/latest4.txt").map { line =>
+  val dm = sc.textFile("D:/xiaojun/lesson/worksp/scala/ml/src/main/resources/latest6.txt").map { line =>
     val values = line.split(' ').map(_.toDouble)
     Vectors.dense(values)
   }
-  //dm.foreach(println)
+  dm.foreach(println)
   
   println(dm.count + " * " + dm.take(1)(0).size)
   val ma = dm.map(_.toArray).take(dm.count.toInt)
   val localMat = Matrices.dense( dm.count.toInt, dm.take(1)(0).size, transpose(ma).flatten )  
   
   // Multiply two matrices
-  rmat.multiply(localMat).rows.foreach(println)
+  rmat.multiply(localMat).rows.zipWithIndex.map(e => e._2 -> e._1).sortByKey(true).foreach(e => println(e._2))
 
   
   /**
