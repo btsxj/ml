@@ -10,7 +10,7 @@ import scala.io.Source
 
 object TFIDF {
 
-  val spConfig = (new SparkConf).setMaster("local").setAppName("TFIDF Demo")
+  val spConfig = (new SparkConf).setMaster("local").setAppName("My TFIDF Demo")
   val sc = new SparkContext(spConfig)
 
   /**
